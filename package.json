@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/dstumpe264/Skies_Eyes#readme",
   "dependencies": {
-    "inquirer": "^8.2.4"
+    "inquirer": "^8.2.4",
+    "mysql2": "^3.0.1"
   }
 }
