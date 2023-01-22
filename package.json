@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/dstumpe264/Skies_Eyes#readme",
   "dependencies": {
+    "body-parser": "^1.20.1",
+    "console.table": "^0.10.0",
     "inquirer": "^8.2.4",
     "mysql2": "^3.0.1"
   }

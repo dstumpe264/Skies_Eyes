@@ -1,13 +1,20 @@
 const express = require('express');
 // Import and require mysql2
 const mysql = require('mysql2');
+const bodyParser = require('body-parser');
 
-const PORT = process.env.PORT || 3001;
+// import console table to organize data from mysql better
+const cTable = require('console.table');
+
+const PORT = 3001;
 const app = express();
 
 // Express middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+app.use(bodyParser.json());
+
 
 // Connect to database
 const db = mysql.createConnection(
@@ -23,15 +30,14 @@ const db = mysql.createConnection(
 );
 
 // Create an employee
-app.post('/api/new-employee', ({ body }, res) => {
-  const sql = `INSERT INTO employees (employee_name)
-    VALUES (?)`;
-  const params = [body.employee_name];
-  
+app.post('/api/new-employee', ({body}, res) => {
+  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
+  const params = [body.first_name, body.last_name, body.role_id, body.manager_id];
   db.query(sql, params, (err, result) => {
     if (err) {
-      res.status(400).json({ error: err.message });
-      return;
+
+        res.status(400).json({ error: err.message });
+        return;
     }
     res.json({
       message: 'success',
@@ -40,11 +46,28 @@ app.post('/api/new-employee', ({ body }, res) => {
   });
 });
 
+
 // Read all employees
 app.get('/api/employees', (req, res) => {
-  const sql = `SELECT id, employee_name AS name FROM employees`;
+  const sql = `SELECT * FROM employee`;
   
   db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+       return;
+    }
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
+});
+// Read employee by id
+app.get('/api/employee/:id', (req, res) => {
+  const sql = `SELECT * FROM employee WHERE id = ?`;
+  const params = [req.params.id];
+
+  db.query(sql, params, (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
        return;
@@ -58,7 +81,7 @@ app.get('/api/employees', (req, res) => {
 
 // Delete an employee
 app.delete('/api/employee/:id', (req, res) => {
-  const sql = `DELETE FROM employees WHERE id = ?`;
+  const sql = `DELETE FROM employee WHERE id = ?`;
   const params = [req.params.id];
   
   db.query(sql, params, (err, result) => {
@@ -77,9 +100,6 @@ app.delete('/api/employee/:id', (req, res) => {
     }
   });
 });
-
-
-
 
 
 // Default response for any other request (Not Found)
